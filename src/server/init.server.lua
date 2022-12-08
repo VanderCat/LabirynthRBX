@@ -1,6 +1,9 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ArrPlayers = Players:GetPlayers()
 local maze = require(ServerScriptService.Server.mazegen)
+local Time = game.ReplicatedStorage.TimerValue
+local Text = game.ReplicatedStorage.TimerText
 
 --[[
     local timerStart = os.time()
@@ -54,3 +57,55 @@ local function startGame()
     end
 end
 startGame()
+
+local min = 2
+local sec = 00
+
+while true do
+    sec -= 1
+    if min == 0 and sec == 0 then
+        Text.Value = "Time to End: "
+        break
+    end
+    if sec < 10 and sec >= 0 then
+        sec = "0"..sec
+    end
+    
+    CheckSec = tonumber(sec) --we need to check int, otherwise crash
+    if  CheckSec < 0 then
+        sec = 59
+        min -=1
+    end
+
+    Time.Value = min..":"..sec --Update replicated timer value
+    local DoOnce = false
+        if not DoOnce then
+            DoOnce = true
+            Text.Value = "Time to Start: "
+        end
+    wait(1)
+end
+
+--Update local timer value
+min = 15
+sec = 00
+
+while true do
+
+    sec -= 1
+    if min < 0 and sec < 0 then
+        break
+    end
+    if sec < 10 and sec >= 0 then
+        sec = "0"..sec
+    end
+    
+    CheckSec = tonumber(sec)
+    if  CheckSec < 0 then
+        sec = 59
+        min -=1
+    end
+
+    Time.Value = min..":"..sec --Update replicated timer value
+    wait(1)
+end
