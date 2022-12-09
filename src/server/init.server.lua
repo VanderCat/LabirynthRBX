@@ -1,6 +1,7 @@
-local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local rs = game:GetService("ReplicatedStorage")
 local maze = require(ServerScriptService.Server.mazegen)
+local passagePart = require(rs.Common.models.passage.list)
 
 --[[
     local timerStart = os.time()
@@ -10,45 +11,126 @@ local maze = require(ServerScriptService.Server.mazegen)
         wait(1)
     end
 ]]
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local width, height = 33, 33
+local size = 16
+
+local function getId(x, y)
+    return y*width+x
+end
+local function getNeighbours(maze, x, y) 
+    return {
+        up = maze[getId(x,y+1)]==1,
+        down = maze[getId(x,y-1)]==1,
+        left = maze[getId(x+1,y)]==1,
+        right = maze[getId(x-1,y)]==1,
+    }
+end
+local function generatePart(parent: Instance, maze, x, y)
+    local n = getNeighbours(maze, x, y)
+    local part: Model
+    local rotation = CFrame.Angles(0, math.rad(-90), 0) --alwaysCreate just in case
+
+    --HALLWAY
+    if (n.left and n.right) and not (n.up or n.down) then
+        part = passagePart:getRandomPassage("way"):Clone()
+    elseif (n.up and n.down) and not (n.left or n.right) then
+        part = passagePart:getRandomPassage("way"):Clone()
+        local modelCFrame = part:GetPivot()  --TODO: Refactor
+        part:PivotTo(modelCFrame * rotation)
+    --TURN
+    elseif (n.down and n.right) and not (n.left or n.up) then
+        part = passagePart:getRandomPassage("rWay"):Clone()
+    elseif (n.down and n.left) and not (n.up or n.right) then
+        part = passagePart:getRandomPassage("rWayF"):Clone()
+    elseif (n.up and n.right) and not (n.down or n.left) then
+        part = passagePart:getRandomPassage("rWayR"):Clone()
+    elseif (n.up and n.left) and not (n.down or n.right) then
+        part = passagePart:getRandomPassage("rWayFR"):Clone()
+    --THREEWAY
+    elseif (n.down and n.up and n.right) and not (n.left) then
+        print(x, y, n)
+        part = passagePart:getRandomPassage("tWayR"):Clone()
+    elseif (n.down and n.up and n.left) and not (n.right) then
+        part = passagePart:getRandomPassage("tWayRF"):Clone()
+    elseif (n.up and n.left and n.right) and not (n.down) then
+        part = passagePart:getRandomPassage("tWayF"):Clone()
+    elseif (n.down and n.left and n.right) and not (n.up) then
+        part = passagePart:getRandomPassage("tWay"):Clone()
+    --DEADEND 
+    elseif n.left and not (n.down or n.right or n.up) then
+        part = passagePart:getRandomPassage("nWayF"):Clone()
+        local modelCFrame = part:GetPivot()
+        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90), 0) )
+    elseif n.up and not (n.down or n.right or n.left) then
+        part = passagePart:getRandomPassage("nWayF"):Clone()
+    elseif n.right and not (n.down or n.left or n.up) then
+        part = passagePart:getRandomPassage("nWay"):Clone()
+    elseif n.down and not (n.up or n.right or n.left) then
+        part = passagePart:getRandomPassage("nWay"):Clone()
+        local modelCFrame = part:GetPivot()
+        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90), 0) )
+        --]]
+    -- 4-WAY
+    else
+        --print(x, y, n)
+        return
+    end
+    part.Parent = parent
+    local modelCFrame = part:GetPivot()
+    part:PivotTo(CFrame.new(x*size, size, y*size)*modelCFrame.Rotation)
+end
+
+local function generateDebugPart(parent, maze, x, y)
+    local n = getNeighbours(maze, x, y)
+
+    local partPosition = Vector3.new(x*size+size/3, -size, y*size+size/3)
+    local partSize = Vector3.new(size/3, size, size/3)
+    local partColor = Color3.new(x/width, y/height, 0)
+
+    local debugPart = Instance.new("Part", parent)
+    debugPart.Color = partColor
+    debugPart.Name = getId(x,y).."("..x..","..y..")"
+    debugPart.Anchored = true
+    debugPart.Position = partPosition
+    debugPart.Size=partSize
+    if n.up then
+        local sidePart = debugPart:Clone()
+        sidePart.Parent = debugPart
+        sidePart.Color = Color3.new(1, 0, 0)
+        sidePart.Position = sidePart.Position+Vector3.zAxis*(size/3)
+    end
+    if n.down then
+        local sidePart = debugPart:Clone()
+        sidePart.Parent = debugPart
+        sidePart.Color = Color3.new(0, 1, 0)
+        sidePart.Position = sidePart.Position-Vector3.zAxis*(size/3)
+    end
+    if n.right then
+        local sidePart = debugPart:Clone()
+        sidePart.Parent = debugPart
+        sidePart.Color = Color3.new(0, 0, 1)
+        sidePart.Position = sidePart.Position-Vector3.xAxis*(size/3)
+    end
+    if n.left then
+        local sidePart = debugPart:Clone()
+        sidePart.Parent = debugPart
+        sidePart.Color = Color3.new(1, 0, 1)
+        sidePart.Position = sidePart.Position+Vector3.xAxis*(size/3)
+    end
+end
+
 local function startGame()
     local Model = Instance.new("Model")
     Model.Parent = workspace
-    local width, height = 51, 51
     local newMaze = maze:init(width, height)
     maze:carve(newMaze, width, height, 2, 2)
     newMaze[width + 2] = 0
     newMaze[(height - 2) * width + width - 3] = 0
-    local size = 12
     for y = 0, height - 1 do
         for x = 0, width - 1 do
-            local id = y * width + x
-            local part = Instance.new("Part")
-            part.Name = "mazePart" .. id
-            part.Anchored = true
-            part.Color = Color3.new(1, 1, 1)
-            part.Parent = Model
-            for texNum = 0, 5, 1 do
-                local texture = Instance.new("Texture")
-                texture.Parent=part
-                if texNum == 1 or texNum == 4 then
-                    texture.Texture = "http://www.roblox.com/asset/?id=48888238"
-                    texture.StudsPerTileU = 8
-                    texture.StudsPerTileV = 8
-                else
-                    texture.Texture = "http://www.roblox.com/asset/?id=48888249"
-                    texture.StudsPerTileU = 12
-                    texture.StudsPerTileV = 8
-                    texture.OffsetStudsV = -4
-                end
-                texture.Face = texNum
-            end
-            if newMaze[id] == 1 then
-                part.Position = Vector3.new(x*size, size, y*size)
-                part.Size = Vector3.new(size, size*3, size)
-            else 
-                part.Position = Vector3.new(x*size, -size, y*size)
-                part.Size = Vector3.new(size, size, size)
+            if newMaze[getId(x,y)] == 1 then
+                local part = generateDebugPart(Model, newMaze, x, y)
+                generatePart(Model, newMaze, x, y)
             end
         end
     end
