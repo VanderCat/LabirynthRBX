@@ -11,7 +11,7 @@ local passagePart = require(rs.Common.models.passage.list)
         wait(1)
     end
 ]]
-local width, height = 33, 33
+local width, height = 31, 31
 local size = 16
 
 local function getId(x, y)
@@ -19,16 +19,16 @@ local function getId(x, y)
 end
 local function getNeighbours(maze, x, y) 
     return {
-        up = maze[getId(x,y+1)]==1,
-        down = maze[getId(x,y-1)]==1,
-        left = maze[getId(x+1,y)]==1,
-        right = maze[getId(x-1,y)]==1,
+        up = maze[getId(x,y+1)]==0,
+        down = maze[getId(x,y-1)]==0,
+        left = maze[getId(x+1,y)]==0,
+        right = maze[getId(x-1,y)]==0,
     }
 end
 local function generatePart(parent: Instance, maze, x, y)
     local n = getNeighbours(maze, x, y)
     local part: Model
-    local rotation = CFrame.Angles(0, math.rad(-90), 0) --alwaysCreate just in case
+    local rotation = CFrame.Angles(0, math.rad(90), 0) --alwaysCreate just in case
 
     --HALLWAY
     if (n.left and n.right) and not (n.up or n.down) then
@@ -58,22 +58,23 @@ local function generatePart(parent: Instance, maze, x, y)
         part = passagePart:getRandomPassage("tWay"):Clone()
     --DEADEND 
     elseif n.left and not (n.down or n.right or n.up) then
-        part = passagePart:getRandomPassage("nWayF"):Clone()
-        local modelCFrame = part:GetPivot()
-        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90), 0) )
+        part = passagePart:getRandomPassage("nWay"):Clone()
     elseif n.up and not (n.down or n.right or n.left) then
         part = passagePart:getRandomPassage("nWayF"):Clone()
+        local modelCFrame = part:GetPivot()
+        local modelRotatation = part:GetPivot().Rotation
+        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90)+modelRotatation.Y, 0) )
     elseif n.right and not (n.down or n.left or n.up) then
-        part = passagePart:getRandomPassage("nWay"):Clone()
+        part = passagePart:getRandomPassage("nWayF"):Clone()
     elseif n.down and not (n.up or n.right or n.left) then
         part = passagePart:getRandomPassage("nWay"):Clone()
         local modelCFrame = part:GetPivot()
-        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90), 0) )
+        local modelRotatation = part:GetPivot().Rotation
+        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90)+modelRotatation.Y, 0) )
         --]]
     -- 4-WAY
     else
-        --print(x, y, n)
-        return
+        part = passagePart:getRandomPassage("cWay"):Clone()
     end
     part.Parent = parent
     local modelCFrame = part:GetPivot()
@@ -128,7 +129,7 @@ local function startGame()
     newMaze[(height - 2) * width + width - 3] = 0
     for y = 0, height - 1 do
         for x = 0, width - 1 do
-            if newMaze[getId(x,y)] == 1 then
+            if newMaze[getId(x,y)] == 0 then
                 local part = generateDebugPart(Model, newMaze, x, y)
                 generatePart(Model, newMaze, x, y)
             end
