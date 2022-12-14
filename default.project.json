@@ -6,7 +6,17 @@
     "ReplicatedStorage": {
       "Common": {
         "$path": "src/shared"
-      }
+      },
+      "TimerValue": {
+          "$className": "StringValue",
+          "$properties": {
+          }
+      },
+      "TimerText": {
+        "$className": "StringValue",
+        "$properties": {
+        }
+    }
     },
 
     "ServerScriptService": {
