@@ -1,4 +1,5 @@
 local ServerScriptService = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 local rs = game:GetService("ReplicatedStorage")
 local maze = require(ServerScriptService.Server.mazegen)
 local passagePart = require(rs.Common.models.passage.list)
