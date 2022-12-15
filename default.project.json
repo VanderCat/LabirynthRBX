@@ -2,29 +2,24 @@
   "name": "Labirynth",
   "tree": {
     "$className": "DataModel",
-
     "ReplicatedStorage": {
       "Common": {
         "$path": "src/shared"
       },
       "TimerValue": {
-          "$className": "StringValue",
-          "$properties": {
-          }
+        "$className": "StringValue",
+        "$properties": {}
       },
       "TimerText": {
         "$className": "StringValue",
-        "$properties": {
-        }
-    }
+        "$properties": {}
+      }
     },
-
     "ServerScriptService": {
       "Server": {
         "$path": "src/server"
       }
     },
-
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
@@ -32,7 +27,6 @@
         }
       }
     },
-
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true
@@ -41,19 +35,70 @@
     "Lighting": {
       "$properties": {
         "Ambient": [
-          0,
-          0,
-          0
+          0.1058823529411765,
+          0.1294117647058824,
+          0.1568627450980392
         ],
-        "Brightness": 0,
+        "Brightness": 2,
         "GlobalShadows": true,
         "Outlines": false,
-        "Technology": "Voxel"
+        "Technology": "Future",
+        "ShadowSoftness": 0,
+        "OutdoorAmbient": [
+          0.125,
+          0.125,
+          0.125
+        ],
+        "EnvironmentDiffuseScale": 0,
+        "EnvironmentSpecularScale": 0.01,
+        "ClockTime": 13.5,
+        "GeographicLatitude": 35,
+        "ExposureCompensation": 3
+      },
+      "Sky": {
+        "$className": "Sky",
+        "$properties": { 
+          "SunAngularSize": 60,
+          "SunTextureId": "rbxassetid://11819281013",
+          "SkyboxBk": "rbxassetid://11819281013",
+          "SkyboxDn": "rbxassetid://11819281013",
+          "SkyboxFt": "rbxassetid://11819281013",
+          "SkyboxLf": "rbxassetid://11819281013",
+          "SkyboxRt": "rbxassetid://11819281013",
+          "SkyboxUp": "rbxassetid://11819281013"
+        }
+      },
+      "Atmosphere": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.3,
+          "Offset": 0,
+          "Color": [
+            0.4431372549019608,
+            0.5372549019607843,
+            0.6392156862745098
+          ],
+          "Decay": [
+            0.4431372549019608,
+            0.5372549019607843,
+            0.6392156862745098
+          ],
+          "Haze": 10,
+          "Glare": 1.26
+        }
+      },
+      "SunRays": {
+        "$className":"SunRaysEffect",
+        "$properties": {
+          "Intensity": 0.5,
+          "Spread": 0.15
+        }
       }
     },
     "SoundService": {
       "$properties": {
-        "RespectFilteringEnabled": true
+        "RespectFilteringEnabled": true,
+        "AmbientReverb": "StoneCorridor"
       }
     }
   }
