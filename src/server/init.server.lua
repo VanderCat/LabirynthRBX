@@ -15,22 +15,11 @@ local Text = game.ReplicatedStorage.TimerText
         wait(1)
     end
 ]]
-local width, height = 31, 31
+
 local size = 16
 
-local function getId(x, y)
-    return y*width+x
-end
-local function getNeighbours(maze, x, y) 
-    return {
-        up = maze[getId(x,y+1)]==0,
-        down = maze[getId(x,y-1)]==0,
-        left = maze[getId(x+1,y)]==0,
-        right = maze[getId(x-1,y)]==0,
-    }
-end
 local function generatePart(parent: Instance, maze, x, y)
-    local n = getNeighbours(maze, x, y)
+    local n = maze:getNeighbours(x, y)
     local part: Model
     local rotation = CFrame.Angles(0, math.rad(90), 0) --alwaysCreate just in case
 
@@ -86,15 +75,15 @@ local function generatePart(parent: Instance, maze, x, y)
 end
 
 local function generateDebugPart(parent, maze, x, y)
-    local n = getNeighbours(maze, x, y)
+    local n = maze:getNeighbours(x, y)
 
     local partPosition = Vector3.new(x*size+size/3, -size, y*size+size/3)
     local partSize = Vector3.new(size/3, size, size/3)
-    local partColor = Color3.new(x/width, y/height, 0)
+    local partColor = Color3.new(x/maze.width, y/maze.height, 0)
 
     local debugPart = Instance.new("Part", parent)
     debugPart.Color = partColor
-    debugPart.Name = getId(x,y).."("..x..","..y..")"
+    debugPart.Name = maze:getId(x,y).."("..x..","..y..")"
     debugPart.Anchored = true
     debugPart.Position = partPosition
     debugPart.Size=partSize
@@ -124,23 +113,25 @@ local function generateDebugPart(parent, maze, x, y)
     end
 end
 
-local function startGame()
+local function startGame(width, height, startX, startY, exitX, exitY)
     local Model = Instance.new("Model")
     Model.Parent = workspace
     local newMaze = maze:init(width, height)
-    maze:carve(newMaze, width, height, 2, 2)
-    newMaze[width + 2] = 0
-    newMaze[(height - 2) * width + width - 3] = 0
+    newMaze:carve(2, 2)
+    newMaze[newMaze:getId(1,0)] = 0
+    newMaze[newMaze:getId(width-2,height)] = 0
+    print(newMaze)
     for y = 0, height - 1 do
         for x = 0, width - 1 do
-            if newMaze[getId(x,y)] == 0 then
-                local part = generateDebugPart(Model, newMaze, x, y)
+            if newMaze[newMaze:getId(x,y)] == 0 then
                 generatePart(Model, newMaze, x, y)
             end
+            generateDebugPart(Model, newMaze, x, y)
         end
     end
 end
-startGame()
+local width, height = 31, 31
+startGame(width, height, 2, 0, width-height)
 
 local min = 2
 local sec = 00
