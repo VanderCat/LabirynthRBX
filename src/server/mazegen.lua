@@ -1,11 +1,19 @@
 local maze = {}
-maze.__index = maze
+maze.__index = maze -- OOP
 
-function maze:getId(x, y)
+---Get array index from x and y
+---@param x number
+---@param y number
+---@return number
+function maze:getId(x:number, y:number)
     return y*self.width+x
 end
 
-function maze:getNeighbours(x, y)
+--- Get neighbour pixels.
+---@param x number
+---@param y number
+---@return table
+function maze:getNeighbours(x:number, y:number)
     return {
         up = self[self:getId(x,y+1)]==0,
         down = self[self:getId(x,y-1)]==0,
@@ -13,7 +21,7 @@ function maze:getNeighbours(x, y)
         right = self[self:getId(x-1,y)]==0,
     }
 end
-
+---Internal function. Do not use
 function maze:generateBounds()
     for y = 0, self.height - 1 do
         for x = 0, self.width - 1 do
@@ -31,16 +39,21 @@ function maze:generateBounds()
         self[self:getId(x, self.height - 1)] = 0
     end
 end
-
-function maze:init(width, height)
+---Create empty maze. May later add some other algorythms.
+---@param width number
+---@param height number
+---@return table
+function maze:init(width:number, height:number)
     local result = {width=width, height=height}
-    setmetatable(result, self)
+    setmetatable(result, self) -- OOP
     result:generateBounds()
     return result
 end
 
--- Carve the maze starting at x, y.
-function maze:carve(x, y)
+---Carve the maze starting from x, y. Recursive
+---@param x number
+---@param y number
+function maze:carve(x:number, y:number)
     local r = math.random(0, 3)
     self[self:getId(x,y)] = 0
     for i = 0, 3 do
@@ -69,6 +82,7 @@ function maze:carve(x, y)
     end
 end
 
+-- called if maze object is converted to string.
 function maze:__tostring()
     local string = "\n"
     for y = self.height - 1, 0, -1 do

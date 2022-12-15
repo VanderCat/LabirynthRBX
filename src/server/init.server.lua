@@ -1,24 +1,20 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 local rs = game:GetService("ReplicatedStorage")
+
 local maze = require(ServerScriptService.Server.mazegen)
 local passagePart = require(rs.Common.models.passage.list)
-local ArrPlayers = Players:GetPlayers()
+
 local Time = game.ReplicatedStorage.TimerValue
 local Text = game.ReplicatedStorage.TimerText
 
---[[
-    local timerStart = os.time()
-    local timerEnd = timerStart+900
-    while True do 
-        local elapsedTime = timerEnd-os.time()
-        wait(1)
-    end
-]]
-
 local size = 16
-
-local function generatePart(parent: Instance, maze, x, y)
+---Generate random part according to model list
+---@param parent Instance
+---@param maze any
+---@param x number
+---@param y number
+local function generatePart(parent: Instance, maze, x:number, y:number)
     local n = maze:getNeighbours(x, y)
     local part: Model
     local rotation = CFrame.Angles(0, math.rad(90), 0) --alwaysCreate just in case
@@ -56,7 +52,7 @@ local function generatePart(parent: Instance, maze, x, y)
         part = passagePart:getRandomPassage("nWayF"):Clone()
         local modelCFrame = part:GetPivot()
         local modelRotatation = part:GetPivot().Rotation
-        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90)+modelRotatation.Y, 0) )
+        part:PivotTo(modelCFrame * CFrame.Angles(0, math.rad(90)+modelRotatation.Y, 0) ) --i think i also need to keep all other rotattions. not sure
     elseif n.right and not (n.down or n.left or n.up) then
         part = passagePart:getRandomPassage("nWayF"):Clone()
     elseif n.down and not (n.up or n.right or n.left) then
@@ -73,8 +69,13 @@ local function generatePart(parent: Instance, maze, x, y)
     local modelCFrame = part:GetPivot()
     part:PivotTo(CFrame.new(x*size, size, y*size)*modelCFrame.Rotation)
 end
-
-local function generateDebugPart(parent, maze, x, y)
+---Generate debug parts
+---Buggy and not optimized. Do NOT use in production.
+---@param parent Instance
+---@param maze any
+---@param x number
+---@param y number
+local function generateDebugPart(parent:Instance, maze, x:number, y:number)
     local n = maze:getNeighbours(x, y)
 
     local partPosition = Vector3.new(x*size+size/3, -size, y*size+size/3)
@@ -113,8 +114,9 @@ local function generateDebugPart(parent, maze, x, y)
     end
 end
 
-local function startGame(width, height, startX, startY, exitX, exitY)
+local function startGame(width, height)
     local Model = Instance.new("Model")
+    Model.Name = "Labirynth"
     Model.Parent = workspace
     local newMaze = maze:init(width, height)
     newMaze:carve(2, 2)
@@ -125,62 +127,85 @@ local function startGame(width, height, startX, startY, exitX, exitY)
         for x = 1, width - 2 do
             if newMaze[newMaze:getId(x,y)] == 0 then
                 generatePart(Model, newMaze, x, y)
-                generateDebugPart(Model, newMaze, x, y)
+                --generateDebugPart(Model, newMaze, x, y)
             end
         end
     end
 end
+
 local width, height = 31, 31
-startGame(width, height, 2, 0, width-height)
+--startGame(width, height)
 
-local min = 2
-local sec = 00
-
-while true do
-    sec -= 1
-    if min == 0 and sec == 0 then
-        Text.Value = "Time to End: "
-        break
-    end
-    if sec < 10 and sec >= 0 then
-        sec = "0"..sec
-    end
-    
-    CheckSec = tonumber(sec) --we need to check int, otherwise crash
-    if  CheckSec < 0 then
-        sec = 59
-        min -=1
-    end
-
-    Time.Value = min..":"..sec --Update replicated timer value
-    local DoOnce = false
-        if not DoOnce then
-            DoOnce = true
-            Text.Value = "Time to Start: "
-        end
-    wait(1)
+--TODO: make a better timer system.
+local function onPreparationEnded()
+    Text.Value = "Time to End: "
+    startGame(width, height)
+end
+local function onGameEnded()
+    workspace.Labirynth:Destroy()
+end
+local function onGameLastMinutes()
+    print("Neurotoxin should be activated")
 end
 
---Update local timer value
-min = 15
-sec = 00
+local preparationEnded = false
+local function restartTimers()
+    Text.Value = "Time to Start: "
+    local min = 0
+    local sec = 10
+    while true do
+        sec -= 1
+        if min <= 0 and sec <= 0 then
+            onPreparationEnded()
+            break
+        end
+        if sec < 10 and sec >= 0 then
+            sec = "0"..sec
+        end
+        
+        CheckSec = tonumber(sec) --we need to check int, otherwise crash
+        if  CheckSec < 0 then
+            sec = 59
+            min -=1
+        end
+    
+        Time.Value = min..":"..sec --Update replicated timer value
 
-while true do
-
-    sec -= 1
-    if min < 0 and sec < 0 then
-        break
-    end
-    if sec < 10 and sec >= 0 then
-        sec = "0"..sec
+        wait(1)
     end
     
-    CheckSec = tonumber(sec)
-    if  CheckSec < 0 then
-        sec = 59
-        min -=1
+    --Update local timer value
+    min = 0 -- i would just endup with seconds and then convert them to minutes tbh but whatever
+    sec = 25 -- TODO: acrtually make it seconds based
+    
+    local lastMinutes = min/5
+    local lastSeconds = (lastMinutes%1)*60
+    while true do
+    
+        sec -= 1
+        if min <= 0 and sec <= 0 then
+            onGameEnded()
+            break
+        end
+        if min < lastMinutes and sec <= lastSeconds then
+            onGameLastMinutes()
+            break
+        end
+        if sec < 10 and sec >= 0 then
+            sec = "0"..sec
+        end
+        
+        CheckSec = tonumber(sec)
+        if  CheckSec < 0 then
+            sec = 59
+            min -=1
+        end
+    
+        Time.Value = min..":"..sec --Update replicated timer value
+        wait(1)
     end
+end
 
-    Time.Value = min..":"..sec --Update replicated timer value
-    wait(1)
+while true do
+    restartTimers() -- to avoid stackoverflow
 end

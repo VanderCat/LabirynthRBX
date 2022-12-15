@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+
+local Roact = require(ReplicatedStorage.Common.Roact)
+
 local Time = game.ReplicatedStorage.TimerValue
 local Text = game.ReplicatedStorage.TimerText
-local Roact = require(ReplicatedStorage.Common.Roact)
 
 -- Create a function that creates the elements for our UI.
 -- Later, we'll use components, which are the best way to organize UI in Roact.
@@ -10,7 +12,7 @@ local function clock(currentTime, text)
     return Roact.createElement("ScreenGui", {}, {
         TimeLabel = Roact.createElement("TextLabel", {
             Size = UDim2.new(.2, 0, .1, 0),
-            Text = text .. currentTime 
+            Text = text .. currentTime
         })
     })
 end
