@@ -118,15 +118,15 @@ local function startGame(width, height, startX, startY, exitX, exitY)
     Model.Parent = workspace
     local newMaze = maze:init(width, height)
     newMaze:carve(2, 2)
-    newMaze[newMaze:getId(1,0)] = 0
-    newMaze[newMaze:getId(width-2,height)] = 0
+    newMaze[newMaze:getId(2,1)] = 0
+    newMaze[newMaze:getId(width-3,height-2)] = 0
     print(newMaze)
-    for y = 0, height - 1 do
-        for x = 0, width - 1 do
+    for y = 1, height - 2 do
+        for x = 1, width - 2 do
             if newMaze[newMaze:getId(x,y)] == 0 then
                 generatePart(Model, newMaze, x, y)
+                generateDebugPart(Model, newMaze, x, y)
             end
-            generateDebugPart(Model, newMaze, x, y)
         end
     end
 end
