@@ -25,6 +25,11 @@
         "Client": {
           "$path": "src/client"
         }
+      },
+      "$properties": {
+        "CharacterJumpHeight": 3.6,
+        "CharacterMaxSlopeAngle": 50,
+        "CameraMode": "LockFirstPerson"
       }
     },
     "Workspace": {

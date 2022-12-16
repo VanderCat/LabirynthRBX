@@ -175,8 +175,8 @@ local function restartTimers()
     end
     
     --Update local timer value
-    min = 0 -- i would just endup with seconds and then convert them to minutes tbh but whatever
-    sec = 25 -- TODO: acrtually make it seconds based
+    min = 15 -- i would just endup with seconds and then convert them to minutes tbh but whatever
+    sec = 00 -- TODO: acrtually make it seconds based
     
     local lastMinutes = min/5
     local lastSeconds = (lastMinutes%1)*60
