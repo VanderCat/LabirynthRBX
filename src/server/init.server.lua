@@ -9,6 +9,7 @@ local Time = game.ReplicatedStorage.TimerValue
 local Text = game.ReplicatedStorage.TimerText
 
 local size = 16
+local offset = {x=-32.5, y=1.375, z=98}
 ---Generate random part according to model list
 ---@param parent Instance
 ---@param maze any
@@ -67,7 +68,7 @@ local function generatePart(parent: Instance, maze, x:number, y:number)
     end
     part.Parent = parent
     local modelCFrame = part:GetPivot()
-    part:PivotTo(CFrame.new(x*size, size, y*size)*modelCFrame.Rotation)
+    part:PivotTo(CFrame.new(x*size+offset.x, offset.y, y*size+offset.z)*modelCFrame.Rotation)
 end
 ---Generate debug parts
 ---Buggy and not optimized. Do NOT use in production.
@@ -137,12 +138,22 @@ local width, height = 31, 31
 --startGame(width, height)
 
 --TODO: make a better timer system.
+local offsets = Vector3.new(0, -25, 0)
 local function onPreparationEnded()
     Text.Value = "Time to End: "
     startGame(width, height)
+    workspace.Spawn.Buffer.Exit.Position = workspace.Spawn.Buffer.Exit.Position+offsets
+    workspace.Spawn.LaserWall.Hurt:PivotTo(workspace.Spawn.LaserWall.Hurt:GetPivot()+offsets)
 end
 local function onGameEnded()
     workspace.Labirynth:Destroy()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character then
+            player.Character:BreakJoints()
+        end
+    end
+    workspace.Spawn.Buffer.Exit.Position = workspace.Spawn.Buffer.Exit.Position-offsets
+    workspace.Spawn.LaserWall.Hurt:PivotTo(workspace.Spawn.LaserWall.Hurt:GetPivot()-offsets)
 end
 local function onGameLastMinutes()
     print("Neurotoxin should be activated")
@@ -175,8 +186,8 @@ local function restartTimers()
     end
     
     --Update local timer value
-    min = 15 -- i would just endup with seconds and then convert them to minutes tbh but whatever
-    sec = 00 -- TODO: acrtually make it seconds based
+    min = 0 -- i would just endup with seconds and then convert them to minutes tbh but whatever
+    sec = 10 -- TODO: acrtually make it seconds based
     
     local lastMinutes = min/5
     local lastSeconds = (lastMinutes%1)*60
@@ -184,7 +195,6 @@ local function restartTimers()
     
         sec -= 1
         if min <= 0 and sec <= 0 then
-            onGameEnded()
             break
         end
         if min < lastMinutes and sec <= lastSeconds then
@@ -204,6 +214,7 @@ local function restartTimers()
         Time.Value = min..":"..sec --Update replicated timer value
         wait(1)
     end
+    onGameEnded()
 end
 
 while true do
