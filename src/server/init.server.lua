@@ -155,8 +155,9 @@ local function onGameEnded()
     workspace.Spawn.Buffer.Exit.Position = workspace.Spawn.Buffer.Exit.Position-offsets
     workspace.Spawn.LaserWall.Hurt:PivotTo(workspace.Spawn.LaserWall.Hurt:GetPivot()-offsets)
 end
-local function onGameLastMinutes()
+local function onGameLastMinutes(time)
     print("Neurotoxin should be activated")
+    rs.Events.onNeurotoxinActivated:FireAllClients(time)
 end
 
 local preparationEnded = false
@@ -184,16 +185,16 @@ local function restartTimers()
     onPreparationEnded()
     
     --Update local timer value
-    sec = 10 
+    sec = 60
     
-    local lastSeconds = sec/6
+    local lastSeconds = sec/2
     local isLastSeconds = false
     while sec > 0 do
         sec -= 1
 
         if sec <= lastSeconds and not isLastSeconds then
             isLastSeconds = true
-            onGameLastMinutes()
+            onGameLastMinutes(lastSeconds)
         end
     
         local mins = math.floor(sec/60)
