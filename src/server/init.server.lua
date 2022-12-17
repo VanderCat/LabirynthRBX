@@ -162,56 +162,44 @@ end
 local preparationEnded = false
 local function restartTimers()
     Text.Value = "Time to Start: "
-    local min = 0
-    local sec = 10
-    while true do
+    local sec = 40
+    local soundCuePlayed = false
+    while sec > 0 do
         sec -= 1
-        if min <= 0 and sec <= 0 then
-            onPreparationEnded()
-            break
-        end
-        if sec < 10 and sec >= 0 then
-            sec = "0"..sec
-        end
-        
-        CheckSec = tonumber(sec) --we need to check int, otherwise crash
-        if  CheckSec < 0 then
-            sec = 59
-            min -=1
-        end
     
-        Time.Value = min..":"..sec --Update replicated timer value
-
+        local mins = math.floor(sec/60)
+        local seconds = sec%60
+        Time.Value =  mins..":"..seconds
+        if sec < 30 and not soundCuePlayed then
+            soundCuePlayed = true
+            local sound = Instance.new("Sound", workspace)
+            sound.SoundId = "rbxassetid://11844077358"
+            sound:Play()
+            sound.Ended:Once(function(soundId)
+                sound:Destroy()
+            end)
+        end
         wait(1)
     end
+    onPreparationEnded()
     
     --Update local timer value
-    min = 0 -- i would just endup with seconds and then convert them to minutes tbh but whatever
-    sec = 10 -- TODO: acrtually make it seconds based
+    sec = 10 
     
-    local lastMinutes = min/5
-    local lastSeconds = (lastMinutes%1)*60
-    while true do
-    
+    local lastSeconds = sec/6
+    local isLastSeconds = false
+    while sec > 0 do
         sec -= 1
-        if min <= 0 and sec <= 0 then
-            break
-        end
-        if min < lastMinutes and sec <= lastSeconds then
+
+        if sec <= lastSeconds and not isLastSeconds then
+            isLastSeconds = true
             onGameLastMinutes()
-            break
-        end
-        if sec < 10 and sec >= 0 then
-            sec = "0"..sec
-        end
-        
-        CheckSec = tonumber(sec)
-        if  CheckSec < 0 then
-            sec = 59
-            min -=1
         end
     
-        Time.Value = min..":"..sec --Update replicated timer value
+        local mins = math.floor(sec/60)
+        local seconds = sec%60
+        Time.Value =  mins..":"..seconds
+
         wait(1)
     end
     onGameEnded()
