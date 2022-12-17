@@ -1,12 +1,13 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 local rs = game:GetService("ReplicatedStorage")
+local ss = game:GetService("ServerStorage")
 
 local maze = require(ServerScriptService.Server.mazegen)
 local passagePart = require(rs.Common.models.passage.list)
 
-local Time = game.ReplicatedStorage.TimerValue
-local Text = game.ReplicatedStorage.TimerText
+local Time = rs.TimerValue
+local Text = rs.TimerText
 
 local size = 16
 local offset = {x=-32.5, y=1.375, z=98}
@@ -144,6 +145,7 @@ local function onPreparationEnded()
     startGame(width, height)
     workspace.Spawn.Buffer.Exit.Position = workspace.Spawn.Buffer.Exit.Position+offsets
     workspace.Spawn.LaserWall.Hurt:PivotTo(workspace.Spawn.LaserWall.Hurt:GetPivot()+offsets)
+    ss.Events.onGameStart:Fire()
 end
 local function onGameEnded()
     workspace.Labirynth:Destroy()
@@ -154,10 +156,12 @@ local function onGameEnded()
     end
     workspace.Spawn.Buffer.Exit.Position = workspace.Spawn.Buffer.Exit.Position-offsets
     workspace.Spawn.LaserWall.Hurt:PivotTo(workspace.Spawn.LaserWall.Hurt:GetPivot()-offsets)
+    ss.Events.onPreparationStart:Fire()
 end
 local function onGameLastMinutes(time)
     print("Neurotoxin should be activated")
     rs.Events.onNeurotoxinActivated:FireAllClients(time)
+    ss.Events.onNeurotoxinActivated:Fire()
 end
 
 local preparationEnded = false
@@ -175,6 +179,7 @@ local function restartTimers()
             soundCuePlayed = true
             local sound = Instance.new("Sound", workspace)
             sound.SoundId = "rbxassetid://11844077358"
+            sound.SoundGroup = game:GetService("SoundService").Announcer
             sound:Play()
             sound.Ended:Once(function(soundId)
                 sound:Destroy()
@@ -205,7 +210,7 @@ local function restartTimers()
     end
     onGameEnded()
 end
-
+ss:WaitForChild("Events").onPreparationStart:Fire()
 while true do
     restartTimers() -- to avoid stackoverflow
 end

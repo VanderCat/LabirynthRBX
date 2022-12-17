@@ -115,6 +115,12 @@
       "$properties": {
         "RespectFilteringEnabled": true,
         "AmbientReverb": "StoneCorridor"
+      },
+      "Music": {
+        "$className": "SoundGroup"
+      },
+      "Announcer": {
+        "$className": "SoundGroup"
       }
     }
   }
