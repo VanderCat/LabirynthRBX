@@ -46,6 +46,9 @@
             0,0,0
           ]
         }
+      },
+      "TheEnd": {
+        "$path": "models/end.rbxmx"
       }
     },
     "Lighting": {
@@ -120,6 +123,9 @@
         "$className": "SoundGroup"
       },
       "Announcer": {
+        "$className": "SoundGroup"
+      },
+      "Ambient": {
         "$className": "SoundGroup"
       }
     }
