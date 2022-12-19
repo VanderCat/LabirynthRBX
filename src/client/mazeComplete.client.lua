@@ -16,6 +16,11 @@ local function onMazeComplete()
         sound.Ended:Once(function()
             sound:Destroy()
         end)
+        local leaderstats = player.leaderstats
+        local mazeStat = leaderstats and leaderstats:FindFirstChild("Maze Completed")
+        if mazeStat then
+            mazeStat.Value = mazeStat.Value + 1
+        end
     end
 end
 
