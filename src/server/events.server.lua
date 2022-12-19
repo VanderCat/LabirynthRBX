@@ -4,6 +4,10 @@ local folder = Instance.new("Folder", ReplicatedStorage)
 folder.Name = "Events"
 local onNeurotoxinActivated = Instance.new("RemoteEvent", folder)
 onNeurotoxinActivated.Name = "onNeurotoxinActivated"
+local onMazeComplete = Instance.new("RemoteEvent", folder)
+onMazeComplete.Name = "onMazeComplete"
+local onPreparationStart = Instance.new("RemoteEvent", folder)
+onPreparationStart.Name = "onPreparationStart"
 
 --local
 local ServerStorage = game:GetService("ServerStorage")

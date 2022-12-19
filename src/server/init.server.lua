@@ -210,7 +210,7 @@ local function restartTimers()
     end
     onGameEnded()
 end
-workspace.TheEnd:MoveTo(Vector3.new(412.799988, -22.0149994, 613))
+
 ss:WaitForChild("Events").onPreparationStart:Fire()
 while true do
     restartTimers() -- to avoid stackoverflow
