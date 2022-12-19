@@ -18,8 +18,12 @@ sound.Name = "OST"
 sound.SoundGroup = game:GetService("SoundService").Music
 sound.Looped = true
 
+local function getCurrentSoundbank()
+    return songs[sound:GetAttribute("soundBank")]
+end
+
 local function getRandomSound()
-    local variants = songs[sound:GetAttribute("soundBank")]
+    local variants = getCurrentSoundbank()
     local id = math.random(1, #variants)
     return variants[id]
 end
@@ -32,7 +36,7 @@ end
 
 sound.DidLoop:Connect(function(soundId)
     local next = soundId
-    while next == soundId do
+    while next == soundId and #getCurrentSoundbank() > 1 do
         next = getRandomSound()
     end
 end)
