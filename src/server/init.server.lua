@@ -164,6 +164,12 @@ local function onGameLastMinutes(time)
     ss.Events.onNeurotoxinActivated:Fire()
 end
 
+local function RenderTime(sec)
+    local mins = tostring(math.floor(sec/60))
+    local seconds = tostring(sec%60)
+    return (#mins<2 and "0" or "")..mins..":"..(#seconds<2 and "0" or "")..seconds
+end
+
 local preparationEnded = false
 local function restartTimers()
     Text.Value = "Time to Start: "
@@ -172,9 +178,7 @@ local function restartTimers()
     while sec > 0 do
         sec -= 1
     
-        local mins = math.floor(sec/60)
-        local seconds = sec%60
-        Time.Value =  mins..":"..seconds
+        Time.Value = RenderTime(sec)
         if sec < 30 and not soundCuePlayed then
             soundCuePlayed = true
             local sound = Instance.new("Sound", workspace)
@@ -202,9 +206,7 @@ local function restartTimers()
             onGameLastMinutes(lastSeconds)
         end
     
-        local mins = math.floor(sec/60)
-        local seconds = sec%60
-        Time.Value =  mins..":"..seconds
+        Time.Value = RenderTime(sec)
 
         wait(1)
     end
