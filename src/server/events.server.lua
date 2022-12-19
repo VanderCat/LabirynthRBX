@@ -14,11 +14,11 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local folder = Instance.new("Folder", ServerStorage)
 folder.Name = "Events"
-local onNeurotoxinActivated = Instance.new("BindableEvent", folder)
-onNeurotoxinActivated.Name = "onNeurotoxinActivated"
+local onNeurotoxinActivatedServer = Instance.new("BindableEvent", folder)
+onNeurotoxinActivatedServer.Name = "onNeurotoxinActivated"
 
-local onPreparationStart = Instance.new("BindableEvent", folder)
-onPreparationStart.Name = "onPreparationStart"
+local onPreparationStartServer = Instance.new("BindableEvent", folder)
+onPreparationStartServer.Name = "onPreparationStart"
 
 local onGameStart = Instance.new("BindableEvent", folder)
 onGameStart.Name = "onGameStart"

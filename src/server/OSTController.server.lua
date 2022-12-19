@@ -3,13 +3,17 @@ local Events = ServerStorage:WaitForChild("Events")
 
 local songs = {
     intro = {
-        "rbxassetid://1838028562"
+        "rbxassetid://11860852793",
+        "rbxassetid://11860855964"
     },
     game = {
-        "rbxassetid://1842727209"
+        "rbxassetid://11860851508",
+        "rbxassetid://11860855964",
+        "rbxassetid://11860859072"
     },
     neurotoxin = {
-        "rbxassetid://6911766512"
+        "rbxassetid://11860851508",
+        "rbxassetid://11860857018"
     }
 }
 
