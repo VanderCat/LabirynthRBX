@@ -190,7 +190,7 @@ local function restartTimers()
     onPreparationEnded()
     
     --Update local timer value
-    sec = 60
+    sec = 360
     
     local lastSeconds = sec/2
     local isLastSeconds = false
@@ -210,6 +210,7 @@ local function restartTimers()
     end
     onGameEnded()
 end
+workspace.TheEnd:MoveTo(Vector3.new(412.799988, -22.0149994, 613))
 ss:WaitForChild("Events").onPreparationStart:Fire()
 while true do
     restartTimers() -- to avoid stackoverflow
